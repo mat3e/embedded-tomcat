@@ -1,0 +1,78 @@
+<html>
+<head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+          integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+</head>
+<body>
+
+<main class="container">
+    <form>
+        <fieldset class="form-group form-inline">
+            <input id="newTodoText" class="form-control" placeholder="Nowe TODO">
+            <button id="addTodo" class="btn btn-primary">+</button>
+        </fieldset>
+        <fieldset id="allTodos" class="form-group"></fieldset>
+    </form>
+</main>
+
+<script>
+  (function() {
+    const URL = 'http://localhost:8080/api/todos';
+
+    const todos = document.getElementById('allTodos');
+    const button = document.getElementById('addTodo');
+    const textToAdd = document.getElementById('newTodoText');
+
+    fetch(URL)
+      .then(processOkResponse)
+      .then(tasks => tasks.forEach(createNewTodo));
+
+    button.onclick = (event) => {
+      event.preventDefault();
+      fetch(URL, { method: 'POST', body: textToAdd.value })
+        .then(response => processOkResponse(response, () => textToAdd.value = ''))
+        .then(todo => createNewTodo(todo))
+        .catch(err => console.error(err));
+    };
+
+    function createNewTodo(todo) {
+      const div = document.createElement('div');
+      div.classList.add('form-check');
+      div.innerHTML = (`
+        ${createCheckbox(todo)}
+        ${createLabel(todo)}
+      `);
+      todos.appendChild(div);
+      const newTodo = document.getElementById(`check-${todo.id}`);
+      newTodo.onclick = () => fetch(`${URL}/${todo.id}`, { method: 'PUT' })
+        .then(processOkResponse)
+        .then(updatedTodo => newTodo.checked = !!updatedTodo.done)
+        .catch(err => console.error(err));
+    }
+
+    function createLabel(todo) {
+      return (`
+        <label for="check-${todo.id}">${todo.text}</label>
+      `);
+    }
+
+    function createCheckbox(todo) {
+      return (`
+        <input type="checkbox" id="check-${todo.id}" class="form-check-input" ${todo.done ? 'checked /' : '/'}>
+      `);
+    }
+
+    function processOkResponse(response = {}, callbackWhenOk = () => {
+    }) {
+      if (response.ok) {
+        callbackWhenOk();
+        return response.json();
+      }
+      throw new Error(`Status not 200 (${response.status})`);
+    }
+  })();
+</script>
+</body>
+</html>

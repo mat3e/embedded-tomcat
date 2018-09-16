@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+        <!-- JDBC -->
+        <property name="connection.driver_class">org.h2.Driver</property>
+        <property name="connection.url">jdbc:h2:~/task-list;AUTO_SERVER=TRUE</property>
+        <property name="connection.username">sa</property>
+        <property name="connection.password"></property>
+        <!-- what when SessionFactory initialization? E.g. "create-drop" = "resetting"; update/validate should be OK -->
+        <property name="hbm2ddl.auto">create-drop</property>
+        <!-- Hibernate optimizations -->
+        <property name="dialect">org.hibernate.dialect.H2Dialect</property>
+        <!-- SQL logging -->
+        <property name="show_sql">true</property>
+        <!-- mapping files -->
+        <mapping class="com.infoshareacademy.workshop.model.Welcome"/>
+    </session-factory>
+</hibernate-configuration>
